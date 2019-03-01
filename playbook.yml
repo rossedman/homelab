@@ -1,0 +1,47 @@
+---
+- hosts: localhost
+  # run this task in the host
+  connection: local
+  vars:
+    consul_version: "1.4.0"
+    consul_url: "https://releases.hashicorp.com/consul/{{ consul_version }}/consul_{{ consul_version }}_linux_amd64.zip"
+  tasks:
+    - name: create containers
+      loop: "{{ groups['all'] }}"
+      lxd_container:
+        name: "{{ item }}"
+        state: started
+        source:
+          type: image
+          mode: pull
+          server: https://images.linuxcontainers.org
+          alias: ubuntu/xenial/amd64
+        config:
+          security.nesting: "true"
+          security.privileged: "true"
+        devices:
+          eth0:
+            type: nic
+            nictype: bridged
+            parent: lxdbr0
+            ipv4.address: "{{ hostvars[item].ip_address }}"
+          root:
+            path: /
+            pool: default
+            type: disk
+        url: https://192.168.86.238:8443
+
+    - name: create cache directory
+      file:
+        path: cache
+        state: directory
+
+    - name: fetch applications
+      unarchive:
+        src: "{{ item.url }}"
+        dest: cache
+        creates: "cache/{{ item.file }}"
+        remote_src: yes
+      loop:
+        - url: "{{ consul_url }}"
+          file: consul

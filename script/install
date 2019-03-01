@@ -1,0 +1,17 @@
+#!/bin/bash
+#
+# install all profiles to lxd cluster
+#
+profiles=$(find ./profiles -name '*.yaml')
+
+for p in $profiles; do
+    name=$(basename "$p" .yaml)
+
+    # try to edit profile
+    cat $p | lxc profile edit $name
+
+    # if edit failed, create profile
+    if [ $? -eq 1 ]; then 
+        cat $p | lxc profile create $name
+    fi
+done

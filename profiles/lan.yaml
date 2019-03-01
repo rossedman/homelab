@@ -1,0 +1,13 @@
+name: lan
+description: expose vm to local network
+config: {}
+devices:
+  eth0:
+    name: eth0
+    nictype: macvlan
+    parent: eno1
+    type: nic
+  root:
+    path: /
+    pool: default
+    type: disk

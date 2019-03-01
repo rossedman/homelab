@@ -1,0 +1,10 @@
+# inventory/hosts
+
+[nginx]
+nginx1           ip_address=172.16.0.153
+nginx2           ip_address=172.16.0.154
+nginx3           ip_address=172.16.0.155
+
+[all:vars]
+ansible_connection=lxd
+ansible_python_interpreter=/usr/bin/python3
