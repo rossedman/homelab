@@ -1,3 +1,5 @@
+proxy   ansible_host=octolab:proxy
+
 [consul_servers]
 consul1 ansible_host=octolab:consul1
 consul2 ansible_host=octolab:consul2

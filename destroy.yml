@@ -1,0 +1,11 @@
+---
+- hosts: localhost
+  connection: local
+  vars:
+    lxd_endpoint: https://octo1.lan:8443
+  tasks:
+    - name: destroy all containers
+      loop: "{{ groups['all'] }}"
+      lxd_container:
+        name: "{{ item }}"
+        state: absent

@@ -7,14 +7,13 @@
   apt:
     update_cache: yes
 
-- name: install docker and openjdk
+- name: install docker
   apt:
     name: "{{ packages }}"
     state: present
   vars:
     packages:
       - docker.io
-      - openjdk-11-jdk-headless
 
 - name: start docker service
   service:
