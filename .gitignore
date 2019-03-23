@@ -1,2 +1,4 @@
 cache
 *.retry
+.vscode
+__pycache__

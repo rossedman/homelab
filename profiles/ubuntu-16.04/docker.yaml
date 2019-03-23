@@ -15,6 +15,7 @@ config:
     packages:
     - docker-ce
     - jq
+    - python
     write_files:
     - path: /lib/systemd/system/setup-network-environment.service
       content: |

@@ -1,0 +1,2 @@
+[all]
+test  ansible_connection=lxd ansible_host=octolab:test

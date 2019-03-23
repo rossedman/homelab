@@ -2,9 +2,54 @@
 
 This is my homelab! It allows me to launch system containers to emulate real nodes in an environment and even bootstrap container based workflows like Kubernetes! I chose LXD because of its ease of install and the ability to use cloud-config which is a big plus in a local environment.
 
+```
+conda config --add channels conda-forge
+conda env create -f conda.yaml
+conda activate ansible
+pip install -r requirements.txt
+```
+
 ---
 
 ## Examples
+
+#### Ansible + LXD
+
+The container to be managed by Ansible must have python and use the `base` role, here is an example of how to launch one:
+
+```
+lxc launch -p lan -p base ubuntu:16.04 my-container
+```
+
+After launching a container through LXD (or Ansible) it needs to be entered into an inventory using this format:
+
+```
+[group]
+$name  ansible_connection=lxd ansible_host=$remote:$name
+```
+
+If you launch a container named `my-container` on your remote host `lab` the entry would look like this:
+
+```
+[all]
+my-container  ansible_connection=lxd ansible_host=lab:my-container
+```
+
+Then you can run to test
+
+```
+ansible all -i inventory -m ping -vvvv
+
+my-container | SUCCESS => {
+    "changed": false,
+    "invocation": {
+        "module_args": {
+            "data": "pong"
+        }
+    },
+    "ping": "pong"
+}
+```
 
 #### Docker-In-LXD
 
@@ -57,6 +102,7 @@ Profiles can be combined to create combinations of nodes
 
 ```
 lxc launch -p lan -p docker ubuntu:16.04 docker1
+lxc launch -p lan -p docker images:debian/jessie/amd64 hub1
 ```
 
 ## Other Helpful Commands

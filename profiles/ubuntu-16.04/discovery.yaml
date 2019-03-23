@@ -7,6 +7,7 @@ config:
     package_update: true
     packages:
     - etcd
+    - python
     write_files:
     - path: /lib/systemd/system/setup-network-environment.service
       content: |
