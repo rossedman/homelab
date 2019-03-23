@@ -1,0 +1,15 @@
+---
+- name: run consul_service
+  import_role:
+    name: consul_service
+
+- name: copy consul config
+  template:
+    src: consul.hcl.j2
+    dest: /etc/consul.d/consul.hcl
+
+- name: start consul
+  service:
+    name: consul
+    state: restarted
+    enabled: yes

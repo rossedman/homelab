@@ -1,0 +1,76 @@
+---
+- hosts: localhost
+  # run this task in the host
+  connection: local
+  vars:
+    consul_version: "1.4.0"
+    nomad_version: "0.8.6"
+    consul_url: "https://releases.hashicorp.com/consul/{{ consul_version }}/consul_{{ consul_version }}_linux_amd64.zip"
+    nomad_url: "https://releases.hashicorp.com/nomad/{{ nomad_version }}/nomad_{{ nomad_version }}_linux_amd64.zip"
+    lxd_endpoint: https://octo1.lan:8443
+  tasks:
+    - name: create containers
+      loop: "{{ groups['all'] }}"
+      lxd_container:
+        name: "{{ item }}"
+        state: started
+        source:
+          type: image
+          mode: pull
+          server: https://images.linuxcontainers.org
+          alias: ubuntu/xenial/amd64
+        config:
+          security.nesting: "{{ 'true' if item in ['nomad-client1', 'nomad-client2', 'nomad-client3'] else 'false' }}"
+          security.privileged: "{{ 'true' if item in ['nomad-client1', 'nomad-client2', 'nomad-client3'] else 'false' }}"
+        devices:
+          eth0:
+            name: eth0
+            nictype: macvlan
+            parent: eno1
+            type: nic
+        url: "{{ lxd_endpoint }}"
+        wait_for_ipv4_addresses: true
+        timeout: 600
+
+    # - name: check python is installed in container
+    #   loop: "{{ groups['all'] }}"
+    #   delegate_to: "{{ item }}"
+    #   raw: dpkg -s python
+    #   register: python_install_check
+    #   failed_when: python_install_check.rc not in [0, 1]
+    #   changed_when: false
+
+    - name: install python in container
+      loop: "{{ groups['all'] }}"
+      delegate_to: "{{ item }}"
+      raw: apt-get install -y python
+      #when: python_install_check.rc == 1
+
+    - name: create cache directory
+      file: { path: cache, state: directory }
+
+    - name: fetch applications
+      unarchive:
+        src: "{{ item.url }}"
+        dest: cache
+        creates: "cache/{{ item.file }}"
+        remote_src: yes
+      loop:
+        - url: "{{ consul_url }}"
+          file: consul
+        - url: "{{ nomad_url }}"
+          file: nomad
+
+- hosts: consul_servers
+  roles:
+    - consul_server
+
+- hosts: nomad_servers
+  roles:
+    - consul_client
+    - nomad_server
+
+- hosts: nomad_clients
+  roles:
+    - consul_client
+    - nomad_client

@@ -9,6 +9,14 @@ conda activate ansible
 pip install -r requirements.txt
 ```
 
+## Quickstart
+
+Containers can be created with Ansible and then managed with them:
+
+```
+ansible-playbook -i hashistack hashistack.yml
+```
+
 ---
 
 ## Examples
