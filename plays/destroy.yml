@@ -9,3 +9,4 @@
       lxd_container:
         name: "{{ item }}"
         state: absent
+        url: "{{ lxd_endpoint }}"

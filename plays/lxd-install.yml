@@ -1,0 +1,45 @@
+---
+- hosts: lxd_master
+  become: true
+  roles:
+    - lxd_server
+
+- hosts: localhost
+  connection: local
+  vars:
+    lxd_endpoint: https://octo1.lan:8443
+  tasks:
+    - name: install default profile
+      lxd_profile:
+        url: "{{ lxd_endpoint }}"
+        name: "default"
+        config: {}
+        description: default
+        devices:
+          eth0:
+            name: eth0
+            nictype: bridged
+            parent: lxdbr0
+            type: nic
+          root:
+            path: /
+            pool: default
+            type: disk
+
+    - name: install lan profile
+      lxd_profile:
+        url: "{{ lxd_endpoint }}"
+        name: "lan"
+        config: {}
+        description: expose vm to local network
+        devices:
+          eth0:
+            name: eth0
+            nictype: macvlan
+            parent: eno1
+            type: nic
+          root:
+            path: /
+            pool: default
+            type: disk
+

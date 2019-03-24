@@ -2,24 +2,68 @@
 
 This is my homelab! It allows me to launch system containers to emulate real nodes in an environment and even bootstrap container based workflows like Kubernetes! I chose LXD because of its ease of install and the ability to use cloud-config which is a big plus in a local environment.
 
+## Bare Metal Setup
+
+This will setup a python environment and install ansible using anaconda
+
 ```
 conda config --add channels conda-forge
 conda env create -f conda.yaml
 conda activate ansible
-pip install -r requirements.txt
 ```
 
-## Quickstart
+Install tools locally that will be needed
+
+```
+brew bundle
+```
+
+From the server, run these commands
+
+```
+$ apt -y update && apt install -y python-minimal
+$ sudo visudo
+```
+
+Change the sudo line to have `NOPASSWD`
+
+```
+%sudo   ALL=(ALL:ALL) ALL
+%sudo   ALL=(ALL:ALL) NOPASSWD: ALL
+```
+
+Once the server is setup the plays can be run
+
+```
+$ ansible-playbook -i inventory/lxd plays/lxd-install.yml
+$ lxc remote add $URL:8443
+$ lxc remote switch $REMOTE_NAME
+```
 
 Containers can be created with Ansible and then managed with them:
 
 ```
-ansible-playbook -i hashistack hashistack.yml
+ansible-playbook -i inventory/hashistack plays/hashistack.yml
+```
+
+This will build a full consul/nomad stack! UI will be available at `http://nomad-server1.lan:4646`, `http://consul1.lan:8500` and `http://proxy.lan:8080`
+
+To teardown you can then run:
+
+```
+ansible-playbook -i hashistack destroy.yml
 ```
 
 ---
 
 ## Examples
+
+#### Nomad Scheduling
+
+```
+export NOMAD_ADDR="http://nomad-server1.lan:4646"
+nomad node status
+```
 
 #### Ansible + LXD
 
@@ -70,57 +114,6 @@ $ export DOCKER_HOST=tcp://$DOCKER1_IP:2375
 $ docker run -p 80:80 -d --name nginx nginx:latest
 $ curl $DOCKER1_IP
 ```
-
----
-
-## Install & Configure LXD
-
-```
-$ apt-get install -y lxd lxd-client
-$ lxd init
-```
-
-Set remote as default
-```
-$ lxc remote add $URL:8443
-$ lxc remote switch $REMOTE_NAME
-```
-
-Setup LAN routing so containers can be available on the network
-
-```
-$ lxc profile copy default lanprofile
-$ lxc profile device set lanprofile eth0 nictype macvlan
-$ lxc profile device set lanprofile eth0 parent eno1
-$ lxc launch -p lanprofile ubuntu:16.04 net1
-$ lxc exec net1 -- apt-get updaate
-$ lxc exec net1 -- apt-get install -y nginx
-$ curl net1.lan 
-```
-
-## Install Profiles
-
-Install default profiles
-
-```
-script/install
-```
-
-Profiles can be combined to create combinations of nodes
-
-```
-lxc launch -p lan -p docker ubuntu:16.04 docker1
-lxc launch -p lan -p docker images:debian/jessie/amd64 hub1
-```
-
-## Other Helpful Commands
-
-Debug cloud-config startup / check service
-
-```
-lxc exec docker1 -- tail -f /var/log/cloud-init-output.log
-```
-
 ---
 
 ## Resources

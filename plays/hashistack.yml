@@ -1,11 +1,10 @@
 ---
 - hosts: localhost
-  # run this task in the host
   connection: local
   vars:
-    consul_version: "1.4.0"
-    nomad_version: "0.8.6"
-    traefik_version: "1.7.5"
+    consul_version: "1.4.4"
+    nomad_version: "0.8.7"
+    traefik_version: "1.7.9"
     consul_url: "https://releases.hashicorp.com/consul/{{ consul_version }}/consul_{{ consul_version }}_linux_amd64.zip"
     nomad_url: "https://releases.hashicorp.com/nomad/{{ nomad_version }}/nomad_{{ nomad_version }}_linux_amd64.zip"
     traefik_url: "https://github.com/containous/traefik/releases/download/v{{ traefik_version }}/traefik_linux-amd64"
@@ -34,19 +33,24 @@
         wait_for_ipv4_addresses: true
         timeout: 600
 
-    - name: check python is installed in container
+    - name: install python
       loop: "{{ groups['all'] }}"
       delegate_to: "{{ item }}"
-      raw: dpkg -s python
-      register: python_install_check
-      failed_when: python_install_check.rc not in [0, 1]
-      changed_when: false
+      raw: test -e /usr/bin/python || (apt -y update && apt install -y python-minimal)
 
-    - name: install python in container
-      loop: "{{ python_install_check.results }}"
-      delegate_to: "{{ item.item }}"
-      raw: apt-get install -y python
-      when: item.rc == 1
+    # - name: check python is installed in container
+    #   loop: "{{ groups['all'] }}"
+    #   delegate_to: "{{ item }}"
+    #   raw: dpkg -s python
+    #   register: python_install_check
+    #   failed_when: python_install_check.rc not in [0, 1]
+    #   changed_when: false
+
+    # - name: install python in container
+    #   loop: "{{ python_install_check.results }}"
+    #   delegate_to: "{{ item.item }}"
+    #   raw: apt-get install -y python
+    #   when: item.rc == 1
 
     - name: create cache directory
       file: { path: cache, state: directory }

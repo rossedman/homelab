@@ -1,0 +1,14 @@
+---
+- name: install lxd
+  apt:
+    name: "{{ item }}"
+    update_cache: yes
+  loop:
+    - lxd
+    - lxd-client
+
+- name: start lxd
+  service:
+    name: lxd
+    state: started
+    enabled: yes
