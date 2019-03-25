@@ -21,7 +21,33 @@ brew bundle
 From the server, run these commands
 
 ```
-$ apt -y update && apt install -y python-minimal
+$ apt -y update && apt install -y python-minimal zfsutils-linux
+$ snap install lxd
+$ cat <<EOF | lxd init --preseed
+config:
+  core.https_address: '[::]:8443'
+  core.trust_password: "octolab"
+networks:
+- config:
+    ipv4.address: auto
+    ipv6.address: none
+  description: ""
+  managed: false
+  name: lxdbr0
+  type: ""
+storage_pools: []
+profiles:
+- config: {}
+  description: ""
+  devices:
+    eth0:
+      name: eth0
+      nictype: bridged
+      parent: lxdbr0
+      type: nic
+  name: default
+cluster: null
+EOF
 $ sudo visudo
 ```
 
@@ -32,10 +58,7 @@ Change the sudo line to have `NOPASSWD`
 %sudo   ALL=(ALL:ALL) NOPASSWD: ALL
 ```
 
-Once the server is setup the plays can be run
-
 ```
-$ ansible-playbook -i inventory/lxd plays/lxd-install.yml
 $ lxc remote add $URL:8443
 $ lxc remote switch $REMOTE_NAME
 ```
@@ -123,3 +146,6 @@ $ curl $DOCKER1_IP
 - https://github.com/Netflix/titus/blob/master/docs/docs/install/cloud-init.yml
 - https://linuxacademy.com/containers/training/course/name/lxc-containers-essentials
 - https://blog.ubuntu.com/2018/01/26/lxd-5-easy-pieces
+- https://blog.ubuntu.com/2018/05/03/lxd-clusters-a-primer
+- https://discuss.linuxcontainers.org/t/lxd-clustering-single-node-cluster-or-convert-standalone-to-cluster/2982/2
+

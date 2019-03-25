@@ -1,0 +1,25 @@
+proxy   ansible_host=octo1:proxy
+
+[etcd]
+etcd1 ansible_host=octo1:etcd1
+etcd2 ansible_host=octo1:etcd2
+etcd3 ansible_host=octo1:etcd3
+
+[kube_api_servers]
+kube-apiserver1 ansible_host=octo1:kube-apiserver1
+kube-apiserver2 ansible_host=octo1:kube-apiserver2
+kube-apiserver3 ansible_host=octo1:kube-apiserver3
+
+[kube_workers]
+kube-worker1 ansible_host=octo1:kube-worker1
+kube-worker2 ansible_host=octo1:kube-worker2
+kube-worker3 ansible_host=octo1:kube-worker3
+kube-worker4 ansible_host=octo1:kube-worker4
+kube-worker5 ansible_host=octo1:kube-worker5
+kube-worker6 ansible_host=octo1:kube-worker6
+kube-worker7 ansible_host=octo1:kube-worker7
+kube-worker8 ansible_host=octo1:kube-worker8
+kube-worker9 ansible_host=octo1:kube-worker9
+
+[all:vars]
+ansible_connection=lxd

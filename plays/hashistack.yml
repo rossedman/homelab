@@ -21,8 +21,8 @@
           server: https://images.linuxcontainers.org
           alias: ubuntu/xenial/amd64
         config:
-          security.nesting: "{{ 'true' if item in ['nomad-client1', 'nomad-client2', 'nomad-client3'] else 'false' }}"
-          security.privileged: "{{ 'true' if item in ['nomad-client1', 'nomad-client2', 'nomad-client3'] else 'false' }}"
+          security.nesting: "true"
+          security.privileged: "true"
         devices:
           eth0:
             name: eth0
@@ -33,24 +33,19 @@
         wait_for_ipv4_addresses: true
         timeout: 600
 
-    - name: install python
+    - name: check python is installed in container
       loop: "{{ groups['all'] }}"
       delegate_to: "{{ item }}"
-      raw: test -e /usr/bin/python || (apt -y update && apt install -y python-minimal)
+      raw: dpkg -s python
+      register: python_install_check
+      failed_when: python_install_check.rc not in [0, 1]
+      changed_when: false
 
-    # - name: check python is installed in container
-    #   loop: "{{ groups['all'] }}"
-    #   delegate_to: "{{ item }}"
-    #   raw: dpkg -s python
-    #   register: python_install_check
-    #   failed_when: python_install_check.rc not in [0, 1]
-    #   changed_when: false
-
-    # - name: install python in container
-    #   loop: "{{ python_install_check.results }}"
-    #   delegate_to: "{{ item.item }}"
-    #   raw: apt-get install -y python
-    #   when: item.rc == 1
+    - name: install python in container
+      loop: "{{ python_install_check.results }}"
+      delegate_to: "{{ item.item }}"
+      raw: apt-get install -y python
+      when: item.rc == 1
 
     - name: create cache directory
       file: { path: cache, state: directory }

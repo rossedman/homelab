@@ -1,25 +1,25 @@
-proxy   ansible_host=octolab:proxy
+proxy   ansible_host=octo1:proxy
 
 [consul_servers]
-consul1 ansible_host=octolab:consul1
-consul2 ansible_host=octolab:consul2
-consul3 ansible_host=octolab:consul3
+consul1 ansible_host=octo1:consul1
+consul2 ansible_host=octo1:consul2
+consul3 ansible_host=octo1:consul3
 
 [nomad_servers]
-nomad-server1 ansible_host=octolab:nomad-server1
-nomad-server2 ansible_host=octolab:nomad-server2
-nomad-server3 ansible_host=octolab:nomad-server3
+nomad-server1 ansible_host=octo1:nomad-server1
+nomad-server2 ansible_host=octo1:nomad-server2
+nomad-server3 ansible_host=octo1:nomad-server3
 
 [nomad_clients]
-nomad-client1 ansible_host=octolab:nomad-client1
-nomad-client2 ansible_host=octolab:nomad-client2
-nomad-client3 ansible_host=octolab:nomad-client3
-nomad-client4 ansible_host=octolab:nomad-client4
-nomad-client5 ansible_host=octolab:nomad-client5
-nomad-client6 ansible_host=octolab:nomad-client6
-nomad-client7 ansible_host=octolab:nomad-client7
-nomad-client8 ansible_host=octolab:nomad-client8
-nomad-client9 ansible_host=octolab:nomad-client9
+nomad-client1 ansible_host=octo1:nomad-client1
+nomad-client2 ansible_host=octo1:nomad-client2
+nomad-client3 ansible_host=octo1:nomad-client3
+nomad-client4 ansible_host=octo1:nomad-client4
+nomad-client5 ansible_host=octo1:nomad-client5
+nomad-client6 ansible_host=octo1:nomad-client6
+nomad-client7 ansible_host=octo1:nomad-client7
+nomad-client8 ansible_host=octo1:nomad-client8
+nomad-client9 ansible_host=octo1:nomad-client9
 
 [all:vars]
 ansible_connection=lxd
